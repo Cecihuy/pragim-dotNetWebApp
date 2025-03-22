@@ -15,7 +15,7 @@
       "launchBrowser": true,
       "applicationUrl": "http://localhost:5566",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Staging",
+        "ASPNETCORE_ENVIRONMENT": "Development",
         "MyKey": "Value of Mykey from launchSettings.json"
       }
     },
