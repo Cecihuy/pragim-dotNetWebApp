@@ -1,27 +1,19 @@
-using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 
 namespace pragim_dotNetWebApp {
   public class Program {
     public static void Main(string[] args) {
       /* =================================== variable =================================== */
-      ExceptionHandlerOptions exceptionHandlerOptions = new ExceptionHandlerOptions { 
-        ExceptionHandlingPath = "/foo.html" // if an error occured, go to this path
-      };
-      DeveloperExceptionPageOptions developerExceptionPageOptions = new DeveloperExceptionPageOptions {
-        SourceCodeLineCount = 10
-      };
       /* =================================== services =================================== */
-        var builder = WebApplication.CreateBuilder(args);
+      var builder = WebApplication.CreateBuilder(args);
       /* =================================== pipeline =================================== */
       var app = builder.Build();
-      app.UseExceptionHandler(exceptionHandlerOptions);
-      app.UseDeveloperExceptionPage(developerExceptionPageOptions);
-      app.UseFileServer();
+      if(app.Environment.IsDevelopment()) { app.UseDeveloperExceptionPage(); }
+      app.UseStaticFiles();
       app.Use(async (context, next) => {
-        throw new Exception("Some error processing the request");
-        await context.Response.WriteAsync("Hello World");
+        await context.Response.WriteAsync("Hosting Environtment: " + app.Environment.EnvironmentName);
         await next();
       });      
       app.Run();
