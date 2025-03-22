@@ -1,7 +1,9 @@
-﻿namespace pragim_dotNetWebApp.Controllers {
-  public class HomeController {
-    public string Index() {
-      return "Hello from MVC";
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace pragim_dotNetWebApp.Controllers {
+  public class HomeController : Controller {
+    public JsonResult Index() {
+      return Json(new { id = 1, name = "pragim" });
     }
   }
 }
