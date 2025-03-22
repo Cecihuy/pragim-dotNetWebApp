@@ -15,13 +15,11 @@ namespace pragim_dotNetWebApp {
       builder.Services.Configure<MvcOptions>(options => {
         options.EnableEndpointRouting = false;
       });
-      builder.Services.AddMvc()
-        .AddXmlSerializerFormatters();
+      builder.Services.AddMvc();
       builder.Services.AddSingleton<IEmployeeRepository, MockEmployeeRepository>();
       /* =================================== pipeline =================================== */
       var app = builder.Build();
       if(app.Environment.IsDevelopment()) { app.UseDeveloperExceptionPage(); }
-      app.UseStaticFiles();
       app.UseMvcWithDefaultRoute();
       app.Use(async (context, next) => {
         await context.Response.WriteAsync("Hello World");
