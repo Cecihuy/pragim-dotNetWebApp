@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Mvc;
+using pragim_dotNetWebApp.Models;
 
 namespace pragim_dotNetWebApp {
   public class Program {
@@ -15,6 +16,7 @@ namespace pragim_dotNetWebApp {
         options.EnableEndpointRouting = false;
       });
       builder.Services.AddMvc();
+      builder.Services.AddSingleton<IEmployeeRepository, MockEmployeeRepository>();
       /* =================================== pipeline =================================== */
       var app = builder.Build();
       if(app.Environment.IsDevelopment()) { app.UseDeveloperExceptionPage(); }
