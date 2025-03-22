@@ -15,7 +15,8 @@ namespace pragim_dotNetWebApp {
       builder.Services.Configure<MvcOptions>(options => {
         options.EnableEndpointRouting = false;
       });
-      builder.Services.AddMvc();
+      builder.Services.AddMvc()
+        .AddXmlSerializerFormatters();
       builder.Services.AddSingleton<IEmployeeRepository, MockEmployeeRepository>();
       /* =================================== pipeline =================================== */
       var app = builder.Build();
