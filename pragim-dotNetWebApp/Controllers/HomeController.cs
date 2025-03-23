@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using pragim_dotNetWebApp.Models;
+using pragim_dotNetWebApp.ViewModels;
 
 namespace pragim_dotNetWebApp.Controllers {
   public class HomeController : Controller {
@@ -11,9 +12,11 @@ namespace pragim_dotNetWebApp.Controllers {
       return _employeeRepository.GetEmployee(1).Name;
     }
     public ViewResult Details() {
-      Employee model = _employeeRepository.GetEmployee(1);
-      ViewBag.PageTitle = "Employee Details";
-      return View(model);
+      HomeDetailsViewModel homeDetailsViewModel = new HomeDetailsViewModel {
+        Employee = _employeeRepository.GetEmployee(1),
+        PageTitle = "Employee Details"
+      };
+      return View(homeDetailsViewModel);
     }
   }
 }
