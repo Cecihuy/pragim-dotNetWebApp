@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Mvc;
@@ -21,10 +20,6 @@ namespace pragim_dotNetWebApp {
       var app = builder.Build();
       if(app.Environment.IsDevelopment()) { app.UseDeveloperExceptionPage(); }
       app.UseMvcWithDefaultRoute();
-      app.Use(async (context, next) => {
-        await context.Response.WriteAsync("Hello World");
-        await next();
-      });
       app.Run();
     }
   }

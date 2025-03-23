@@ -11,6 +11,9 @@ namespace pragim_dotNetWebApp.Models {
         new Employee() { Id= 3, Name= "Sam", Department= "IT", Email= "sam@pragimtech.com"}
       };
     }
+    public IEnumerable<Employee> GetAllEmployee() {
+      return _employees;
+    }
     public Employee GetEmployee(int id) {
       return _employees.FirstOrDefault(e => e.Id == id);
     }
