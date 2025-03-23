@@ -1,17 +1,19 @@
-﻿<html xmlns="http://www.w3.org/1999/xhtml">
+﻿@model pragim_dotNetWebApp.Models.Employee;
+
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <title></title>
 </head>
 <body>
   <h3>@ViewBag.PageTitle</h3>
   <div>
-    Name: @ViewBag.Employee.Name
+    Name: @Model.Name
   </div>
   <div>
-    Email: @ViewBag.Employee.Email
+    Email: @Model.Email
   </div>
   <div>
-    Department: @ViewBag.Employee.Department
+    Department: @Model.Department
   </div>
 </body>
 </html>
