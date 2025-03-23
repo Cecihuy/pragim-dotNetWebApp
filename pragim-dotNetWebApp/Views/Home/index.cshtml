@@ -1,4 +1,4 @@
-﻿@model IEnumerable<pragim_dotNetWebApp.Models.Employee>
+﻿@model IEnumerable<Employee>
 @{
   ViewBag.Title = "Employee List";
 }
@@ -12,7 +12,7 @@
   </thead>
   <tbody>
     @{
-      foreach(pragim_dotNetWebApp.Models.Employee employee in Model) {
+      foreach(Employee employee in Model) {
         <tr>
           <td>@employee.Id</td>
           <td>@employee.Name</td>
