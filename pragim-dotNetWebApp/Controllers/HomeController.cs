@@ -12,7 +12,9 @@ namespace pragim_dotNetWebApp.Controllers {
     }
     public ViewResult Details() {
       Employee model = _employeeRepository.GetEmployee(1);
-      return View("../../MyViews/Test");
+      ViewData["Employee"] = model;
+      ViewData["PageTitle"] = "Employee Details";
+      return View();
     }
   }
 }
