@@ -4,6 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Mvc;
 using pragim_dotNetWebApp.Models;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace pragim_dotNetWebApp {
   public class Program {
@@ -16,7 +18,10 @@ namespace pragim_dotNetWebApp {
         options.EnableEndpointRouting = false;
       });
       builder.Services.AddMvc();
-      builder.Services.AddSingleton<IEmployeeRepository, MockEmployeeRepository>();      
+      builder.Services.AddTransient<IEmployeeRepository, MockEmployeeRepository>();
+      builder.Services.AddDbContextPool<AppDbContext>(options => {
+        options.UseSqlServer(builder.Configuration.GetConnectionString("EmployeeApp"));
+      });
       /* =================================== pipeline =================================== */
       var app = builder.Build();
       if(app.Environment.IsDevelopment()) { app.UseDeveloperExceptionPage(); }
