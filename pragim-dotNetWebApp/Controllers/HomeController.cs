@@ -25,9 +25,12 @@ namespace pragim_dotNetWebApp.Controllers {
       return View();
     }
     [HttpPost]
-    public RedirectToActionResult Create(Employee employee) {
-      Employee newEmployee = _employeeRepository.AddEmployee(employee);
-      return RedirectToAction("details", new {id = newEmployee.Id});
+    public IActionResult Create(Employee employee) {
+      if(ModelState.IsValid) {
+        Employee newEmployee = _employeeRepository.AddEmployee(employee);
+        return RedirectToAction("details", new { id = newEmployee.Id });
+      }
+      return View();
     }
   }
 }
