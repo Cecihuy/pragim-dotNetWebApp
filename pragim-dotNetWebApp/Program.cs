@@ -18,7 +18,7 @@ namespace pragim_dotNetWebApp {
         options.EnableEndpointRouting = false;
       });
       builder.Services.AddMvc();
-      builder.Services.AddTransient<IEmployeeRepository, MockEmployeeRepository>();
+      builder.Services.AddScoped<IEmployeeRepository, SqlEmployeeRepository>();
       builder.Services.AddDbContextPool<AppDbContext>(options => {
         options.UseSqlServer(builder.Configuration.GetConnectionString("EmployeeApp"));
       });

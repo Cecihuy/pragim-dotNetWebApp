@@ -22,5 +22,20 @@ namespace pragim_dotNetWebApp.Models {
       _employees.Add(employee);
       return employee;
     }
+    public Employee UpdateEmployee(Employee employee) {
+      Employee? data = _employees.FirstOrDefault(e => e.Id == employee.Id);
+      if(data != null) {
+        data.Id = employee.Id;
+        data.Name = employee.Name;
+        data.Email = employee.Email;
+        data.Department = employee.Department;
+      }
+      return employee;
+    }
+    public Employee DeleteEmployee(int id) {
+      Employee? employee = _employees.FirstOrDefault(e => e.Id == id);
+      if(employee != null) { _employees.Remove(employee); }      
+      return employee;
+    }
   }
 }
