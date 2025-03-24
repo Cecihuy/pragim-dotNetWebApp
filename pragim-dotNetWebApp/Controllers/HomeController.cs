@@ -20,5 +20,8 @@ namespace pragim_dotNetWebApp.Controllers {
       };
       return View(homeDetailsViewModel);
     }
+    public ViewResult Create() {
+      return View();
+    }
   }
 }
