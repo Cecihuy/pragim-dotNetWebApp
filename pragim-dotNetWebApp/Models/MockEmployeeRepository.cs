@@ -17,5 +17,10 @@ namespace pragim_dotNetWebApp.Models {
     public Employee GetEmployee(int id) {
       return _employees.FirstOrDefault(e => e.Id == id);
     }
+    public Employee AddEmployee(Employee employee) {
+      employee.Id = _employees.Max(empId => empId.Id) + 1;
+      _employees.Add(employee);
+      return employee;
+    }
   }
 }
