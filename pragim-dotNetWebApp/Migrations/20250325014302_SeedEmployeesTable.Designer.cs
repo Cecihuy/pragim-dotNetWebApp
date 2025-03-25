@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using pragim_dotNetWebApp.Models;
 
@@ -10,9 +11,11 @@ using pragim_dotNetWebApp.Models;
 namespace pragim_dotNetWebApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250325014302_SeedEmployeesTable")]
+    partial class SeedEmployeesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,15 +52,8 @@ namespace pragim_dotNetWebApp.Migrations
                         {
                             Id = 1,
                             Department = 2,
-                            Email = "mary@pragimtech.com",
-                            Name = "Mary"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Department = 1,
-                            Email = "john@pragimtech.com",
-                            Name = "John"
+                            Email = "mark@pragimtech.com",
+                            Name = "Mark"
                         });
                 });
 #pragma warning restore 612, 618
