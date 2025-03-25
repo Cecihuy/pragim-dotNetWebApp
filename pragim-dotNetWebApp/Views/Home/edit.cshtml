@@ -1,7 +1,8 @@
 ﻿@model EmployeeEditViewModel
 @{
   ViewBag.Title = "Edit Employee";
-  string photoPath = "~/Images/" + (Model.ExistingPhotoPath ?? "noimage.png");
+  string photoPath = "~/images/" + (Model.ExistingPhotoPath ?? "noimage.png");
+  string debugPause = "debugPause";
 }
 <form enctype="multipart/form-data" asp-controller="home" asp-action="edit" method="post" class="mt-3">
   <input hidden asp-for="Id"/>
