@@ -1,15 +1,17 @@
 ﻿@model IEnumerable<Employee>
 @{
   ViewBag.Title = "Employee List";
+
 }
 <div class="card-group">
   @{
     foreach(Employee employee in Model) {
-      <div class="card m-3 border rounded">
+      string photoPath = "~/Images/" + (employee.PhotoPath ?? "noimage.png");
+      <div class="card m-3 border rounded" style="min-width:18rem; max-width:30.5%;">
         <div class="card-header">
           <h3>@employee.Name</h3>
         </div>
-        <img asp-append-version="true" class="card-img-top" src="~/images/noimage.png" />
+        <img asp-append-version="true" class="card-img-top imageThumbnail" src="@photoPath" />
         <div class="card-footer text-center">
           <a asp-controller="home" asp-action="details" asp-route-id="@employee.Id" class="btn btn-primary m-1"
              >View</a>

@@ -1,13 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using pragim_dotNetWebApp.Models;
 using pragim_dotNetWebApp.ViewModels;
+using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace pragim_dotNetWebApp.Controllers {  
   public class HomeController : Controller {
     private readonly IEmployeeRepository _employeeRepository;
-    public HomeController(IEmployeeRepository employeeRepository) {
+    private readonly IHostEnvironment hostEnvironment;
+
+    public HomeController(IEmployeeRepository employeeRepository, IHostEnvironment hostEnvironment) {
       _employeeRepository = employeeRepository;
+      this.hostEnvironment=hostEnvironment;
     }
     public ViewResult Index() {
       IEnumerable<Employee> model = _employeeRepository.GetAllEmployee();
@@ -25,9 +31,22 @@ namespace pragim_dotNetWebApp.Controllers {
       return View();
     }
     [HttpPost]
-    public IActionResult Create(Employee employee) {
+    public IActionResult Create(EmployeeCreateViewModel model) {
       if(ModelState.IsValid) {
-        Employee newEmployee = _employeeRepository.AddEmployee(employee);
+        string uniqueFileName = null;
+        if(model.Photo !=null) {
+          string uploadsFolder = Path.Combine(hostEnvironment.ContentRootPath, "wwwroot/images");
+          uniqueFileName = Guid.NewGuid().ToString() + "_" + model.Photo.FileName;
+          string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+          model.Photo.CopyTo(new FileStream(filePath, FileMode.Create));
+        }
+        Employee newEmployee = new Employee {
+          Name = model.Name,
+          Email = model.Email,
+          Department = model.Department,
+          PhotoPath = uniqueFileName
+        };
+        _employeeRepository.AddEmployee(newEmployee);
         return RedirectToAction("details", new { id = newEmployee.Id });
       }
       return View();
