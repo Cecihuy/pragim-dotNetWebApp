@@ -20,6 +20,7 @@ namespace pragim_dotNetWebApp.Controllers {
       return View(model);
     }
     public ViewResult Details(int? id) {
+      throw new Exception("error in details");
       Employee employee = _employeeRepository.GetEmployee(id.Value);
       if(employee == null) {
         Response.StatusCode = 404;

@@ -27,6 +27,7 @@ namespace pragim_dotNetWebApp {
       if(app.Environment.IsDevelopment()) { 
         app.UseDeveloperExceptionPage();
       } else {
+        app.UseExceptionHandler("/error");
         app.UseStatusCodePagesWithReExecute("/error/{0}");
       }
       app.UseStaticFiles();

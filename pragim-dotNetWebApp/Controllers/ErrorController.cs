@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace pragim_dotNetWebApp.Controllers {
@@ -14,6 +15,15 @@ namespace pragim_dotNetWebApp.Controllers {
           break;
       }
       return View("notFound");
+    }
+    [Route("error")]
+    [AllowAnonymous]
+    public IActionResult Error() {
+      IExceptionHandlerFeature? exceptionHandlerFeature = HttpContext.Features.Get<IExceptionHandlerFeature>();
+      ViewBag.ExceptionPath = exceptionHandlerFeature.Path;
+      ViewBag.ExceptionMessage = exceptionHandlerFeature.Error.Message;
+      ViewBag.StackTrace = exceptionHandlerFeature.Error.StackTrace;
+      return View("error");
     }
   }
 }
