@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using pragim_dotNetWebApp.Models;
 using pragim_dotNetWebApp.ViewModels;
 using System;
@@ -10,17 +11,29 @@ namespace pragim_dotNetWebApp.Controllers {
   public class HomeController : Controller {
     private readonly IEmployeeRepository _employeeRepository;
     private readonly IHostEnvironment hostEnvironment;
+    private readonly ILogger<HomeController> logger;
 
-    public HomeController(IEmployeeRepository employeeRepository, IHostEnvironment hostEnvironment) {
+    public HomeController(
+      IEmployeeRepository employeeRepository, 
+      IHostEnvironment hostEnvironment,
+      ILogger<HomeController> logger
+    ) {
       _employeeRepository = employeeRepository;
       this.hostEnvironment=hostEnvironment;
+      this.logger=logger;
     }
     public ViewResult Index() {
       IEnumerable<Employee> model = _employeeRepository.GetAllEmployee();
       return View(model);
     }
     public ViewResult Details(int? id) {
-      throw new Exception("error in details");
+      logger.LogTrace("Trace Log");
+      logger.LogDebug("Debug Log");
+      logger.LogInformation("Information Log");
+      logger.LogWarning("Warning Log");
+      logger.LogError("Error Log");
+      logger.LogCritical("Critical Log");
+      //throw new Exception("error in details");
       Employee employee = _employeeRepository.GetEmployee(id.Value);
       if(employee == null) {
         Response.StatusCode = 404;
