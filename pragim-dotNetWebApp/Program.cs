@@ -24,7 +24,11 @@ namespace pragim_dotNetWebApp {
       });
       /* =================================== pipeline =================================== */
       var app = builder.Build();
-      if(app.Environment.IsDevelopment()) { app.UseDeveloperExceptionPage(); }
+      if(app.Environment.IsDevelopment()) { 
+        app.UseDeveloperExceptionPage();
+      } else {
+        app.UseStatusCodePagesWithRedirects("/error/{0}");
+      }
       app.UseStaticFiles();
       app.UseMvc(config => {
         config.MapRoute("custom", "{controller=Home}/{action=Index}/{id?}");
