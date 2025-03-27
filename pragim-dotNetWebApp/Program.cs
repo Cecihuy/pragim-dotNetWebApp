@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 
 namespace pragim_dotNetWebApp {
   public class Program {
@@ -23,6 +24,8 @@ namespace pragim_dotNetWebApp {
       builder.Services.AddDbContextPool<AppDbContext>(options => {
         options.UseSqlServer(builder.Configuration.GetConnectionString("EmployeeApp"));
       });
+      builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+        .AddEntityFrameworkStores<AppDbContext>();
       /* =================================== pipeline =================================== */
       var app = builder.Build();
       if(app.Environment.IsDevelopment()) { 
@@ -32,6 +35,7 @@ namespace pragim_dotNetWebApp {
         app.UseStatusCodePagesWithReExecute("/error/{0}");
       }
       app.UseStaticFiles();
+      app.UseAuthentication();
       app.UseMvc(config => {
         config.MapRoute("custom", "{controller=Home}/{action=Index}/{id?}");
       });
