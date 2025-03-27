@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using pragim_dotNetWebApp.ViewModels;
 using System.Linq;
 using System.Threading.Tasks;
+using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace pragim_dotNetWebApp.Controllers {
   public class AccountController : Controller {
@@ -39,6 +40,23 @@ namespace pragim_dotNetWebApp.Controllers {
     public async Task<IActionResult> Logout() {
       await signInManager.SignOutAsync();
       return RedirectToAction("index", "home");
+    }
+    [HttpGet]
+    public IActionResult Login() {
+      return View("login");
+    }
+    [HttpPost]
+    public async Task<IActionResult> Login(LoginViewModel model) {
+      if(ModelState.IsValid) {
+        SignInResult signInResult = await signInManager.PasswordSignInAsync(
+          model.Email, model.Password, model.RememberMe, false
+        );
+        if(signInResult.Succeeded) {
+          return RedirectToAction("index", "home");
+        }
+        ModelState.AddModelError("", "Invalid Login Attempt");
+      }
+      return View(model);
     }
   }
 }
