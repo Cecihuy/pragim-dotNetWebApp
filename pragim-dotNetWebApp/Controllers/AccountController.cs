@@ -56,7 +56,7 @@ namespace pragim_dotNetWebApp.Controllers {
           model.Email, model.Password, model.RememberMe, false
         );
         if(signInResult.Succeeded) {
-          if(!string.IsNullOrEmpty(returnUrl)) {
+          if(!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl)) {
             return Redirect(returnUrl); 
           } else { 
             return RedirectToAction("index", "home"); 
