@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using pragim_dotNetWebApp.Models;
@@ -7,7 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace pragim_dotNetWebApp.Controllers {  
+namespace pragim_dotNetWebApp.Controllers {
+  [Authorize]
   public class HomeController : Controller {
     private readonly IEmployeeRepository _employeeRepository;
     private readonly IHostEnvironment hostEnvironment;
@@ -22,10 +24,12 @@ namespace pragim_dotNetWebApp.Controllers {
       this.hostEnvironment=hostEnvironment;
       this.logger=logger;
     }
+    [AllowAnonymous]
     public ViewResult Index() {
       IEnumerable<Employee> model = _employeeRepository.GetAllEmployee();
       return View(model);
     }
+    [AllowAnonymous]
     public ViewResult Details(int? id) {
       logger.LogTrace("Trace Log");
       logger.LogDebug("Debug Log");
@@ -49,7 +53,7 @@ namespace pragim_dotNetWebApp.Controllers {
     public ViewResult Create() {
       return View();
     }
-    [HttpPost]
+    [Authorize]
     public IActionResult Create(EmployeeCreateViewModel model) {
       if(ModelState.IsValid) {
         string uniqueFileName = ProcessUploadedFile(model);

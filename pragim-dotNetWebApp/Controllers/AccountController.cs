@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using pragim_dotNetWebApp.ViewModels;
-using System.Linq;
 using System.Threading.Tasks;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
@@ -18,10 +18,12 @@ namespace pragim_dotNetWebApp.Controllers {
       this.signInManager=signInManager;
     }
     [HttpGet]
+    [AllowAnonymous]
     public IActionResult Register() {
       return View();
     }
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IActionResult> Register(RegisterViewModel model) {
       if(ModelState.IsValid) {
         IdentityUser identityUser = new IdentityUser() { UserName = model.Email, Email = model.Email };
@@ -42,9 +44,11 @@ namespace pragim_dotNetWebApp.Controllers {
       return RedirectToAction("index", "home");
     }
     [HttpGet]
+    [AllowAnonymous]
     public IActionResult Login() {
       return View("login");
     }
+    [AllowAnonymous]
     [HttpPost]
     public async Task<IActionResult> Login(LoginViewModel model) {
       if(ModelState.IsValid) {

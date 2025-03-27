@@ -8,16 +8,20 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 
 namespace pragim_dotNetWebApp {
   public class Program {
     public static void Main(string[] args) {
       /* =================================== variable =================================== */
-
+      AuthorizationPolicy authorizationPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser().Build();
       /* =================================== services =================================== */
       var builder = WebApplication.CreateBuilder(args);
       builder.Services.Configure<MvcOptions>(options => {
         options.EnableEndpointRouting = false;
+        options.Filters.Add(new AuthorizeFilter(authorizationPolicy));
       });
       builder.Services.Configure<IdentityOptions>(options => {
         options.Password.RequireUppercase = false;
