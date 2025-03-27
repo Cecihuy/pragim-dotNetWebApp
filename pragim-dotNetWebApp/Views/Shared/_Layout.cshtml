@@ -16,8 +16,9 @@
           asp-fallback-test-class="sr-only"
           asp-fallback-test-property="position"
           asp-fallback-test-value="absolute"
-          asp-suppress-fallback-integrity="true"
-          >
+          asp-suppress-fallback-integrity="true">
+    <script src="~/js/jquery-3.7.0.js"></script>
+    <script src="~/js/bootstrap5.js"></script>
   </environment>
   <link href="~/css/site.css" rel="stylesheet" />
   <title>@ViewBag.Title</title>
@@ -38,6 +39,11 @@
           </li>
           <li class="nav-item">
             <a asp-controller="home" asp-action="create" class="nav-link">Create</a>
+          </li>          
+        </ul>
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a asp-controller="account" asp-action="register" class="nav-link">Register</a>
           </li>
         </ul>
       </div>
