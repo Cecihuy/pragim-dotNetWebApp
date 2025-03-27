@@ -19,6 +19,10 @@ namespace pragim_dotNetWebApp {
       builder.Services.Configure<MvcOptions>(options => {
         options.EnableEndpointRouting = false;
       });
+      builder.Services.Configure<IdentityOptions>(options => {
+        options.Password.RequireUppercase = false;
+        options.Password.RequireDigit = false;
+      });
       builder.Services.AddMvc();
       builder.Services.AddScoped<IEmployeeRepository, SqlEmployeeRepository>();
       builder.Services.AddDbContextPool<AppDbContext>(options => {
