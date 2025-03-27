@@ -17,13 +17,20 @@ namespace pragim_dotNetWebApp.Controllers {
       this.userManager=userManager;
       this.signInManager=signInManager;
     }
-    [HttpGet]
-    [AllowAnonymous]
+    [HttpGet][AllowAnonymous]
     public IActionResult Register() {
       return View();
     }
-    [HttpPost]
-    [AllowAnonymous]
+    [HttpPost][HttpGet][AllowAnonymous]
+    public async Task<IActionResult> IsEmailInUse(string email) {
+      IdentityUser? identityUser = await userManager.FindByEmailAsync(email);
+      if(identityUser == null) {
+        return Json(true);
+      } else {
+        return Json($"Email {email} is already in use");
+      }
+    }
+    [HttpPost][AllowAnonymous]
     public async Task<IActionResult> Register(RegisterViewModel model) {
       if(ModelState.IsValid) {
         IdentityUser identityUser = new IdentityUser() { UserName = model.Email, Email = model.Email };
@@ -43,13 +50,11 @@ namespace pragim_dotNetWebApp.Controllers {
       await signInManager.SignOutAsync();
       return RedirectToAction("index", "home");
     }
-    [HttpGet]
-    [AllowAnonymous]
+    [HttpGet][AllowAnonymous]
     public IActionResult Login() {
       return View("login");
     }
-    [AllowAnonymous]
-    [HttpPost]
+    [HttpPost][AllowAnonymous]
     public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl) {
       if(ModelState.IsValid) {
         SignInResult signInResult = await signInManager.PasswordSignInAsync(

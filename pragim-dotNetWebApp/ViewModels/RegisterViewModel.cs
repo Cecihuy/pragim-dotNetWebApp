@@ -1,9 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace pragim_dotNetWebApp.ViewModels {
   public class RegisterViewModel {
     [Required]
     [EmailAddress]
+    [Remote("isemailinuse","account")]
     public string Email { get; set; }
     [Required]
     [DataType(DataType.Password)]
