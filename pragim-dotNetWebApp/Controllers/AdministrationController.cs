@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using pragim_dotNetWebApp.ViewModels;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace pragim_dotNetWebApp.Controllers {
@@ -21,13 +22,18 @@ namespace pragim_dotNetWebApp.Controllers {
           new IdentityRole { Name = model.RoleName}
         );
         if(identityResult.Succeeded) {
-          return RedirectToAction("index", "home");
+          return RedirectToAction("listRoles", "administration");
         }
         foreach(IdentityError error in identityResult.Errors) {
-          ModelState.AddModelError(error.Code, $" ==> { error.Description}");
+          ModelState.AddModelError("", $"{error.Code} ==> {error.Description}");
         }
       }
       return View(model);
+    }
+    [HttpGet]
+    public IActionResult ListRoles() {
+      IQueryable<IdentityRole> roles = roleManager.Roles;
+      return View(roles);
     }
   }
 }
