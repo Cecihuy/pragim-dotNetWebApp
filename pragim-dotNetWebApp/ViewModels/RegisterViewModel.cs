@@ -16,5 +16,6 @@ namespace pragim_dotNetWebApp.ViewModels {
     [Display(Name = "Confirm Password")]
     [Compare("Password", ErrorMessage = "Password does not match")]
     public string ConfirmPassword { get; set; }
+    public string City { get; set; }
   }
 }

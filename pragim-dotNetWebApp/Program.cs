@@ -32,7 +32,7 @@ namespace pragim_dotNetWebApp {
       builder.Services.AddDbContextPool<AppDbContext>(options => {
         options.UseSqlServer(builder.Configuration.GetConnectionString("EmployeeApp"));
       });
-      builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+      builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
         .AddEntityFrameworkStores<AppDbContext>();
       /* =================================== pipeline =================================== */
       var app = builder.Build();

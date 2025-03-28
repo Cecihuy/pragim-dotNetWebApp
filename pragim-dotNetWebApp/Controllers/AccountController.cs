@@ -1,18 +1,19 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using pragim_dotNetWebApp.Models;
 using pragim_dotNetWebApp.ViewModels;
 using System.Threading.Tasks;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace pragim_dotNetWebApp.Controllers {
   public class AccountController : Controller {
-    private readonly UserManager<IdentityUser> userManager;
-    private readonly SignInManager<IdentityUser> signInManager;
+    private readonly UserManager<ApplicationUser> userManager;
+    private readonly SignInManager<ApplicationUser> signInManager;
 
     public AccountController(
-      UserManager<IdentityUser> userManager, 
-      SignInManager<IdentityUser> signInManager
+      UserManager<ApplicationUser> userManager, 
+      SignInManager<ApplicationUser> signInManager
     ) {
       this.userManager=userManager;
       this.signInManager=signInManager;
@@ -23,7 +24,7 @@ namespace pragim_dotNetWebApp.Controllers {
     }
     [HttpPost][HttpGet][AllowAnonymous]
     public async Task<IActionResult> IsEmailInUse(string email) {
-      IdentityUser? identityUser = await userManager.FindByEmailAsync(email);
+      ApplicationUser? identityUser = await userManager.FindByEmailAsync(email);
       if(identityUser == null) {
         return Json(true);
       } else {
@@ -33,7 +34,9 @@ namespace pragim_dotNetWebApp.Controllers {
     [HttpPost][AllowAnonymous]
     public async Task<IActionResult> Register(RegisterViewModel model) {
       if(ModelState.IsValid) {
-        IdentityUser identityUser = new IdentityUser() { UserName = model.Email, Email = model.Email };
+        ApplicationUser identityUser = new ApplicationUser() { 
+          UserName = model.Email, Email = model.Email, City = model.City
+        };
         IdentityResult identityResult = await userManager.CreateAsync(identityUser, model.Password);
         if(identityResult.Succeeded) {
           await signInManager.SignInAsync(identityUser, false);
