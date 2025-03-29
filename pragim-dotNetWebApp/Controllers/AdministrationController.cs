@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using pragim_dotNetWebApp.Models;
 using pragim_dotNetWebApp.ViewModels;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -56,15 +54,13 @@ namespace pragim_dotNetWebApp.Controllers {
         RoleName = identityRole.Name
       };
       List<ApplicationUser> userList = new List<ApplicationUser>();
-      UserManager<ApplicationUser> userManagerList = userManager;
-      foreach(ApplicationUser user in userManagerList.Users) {
+      foreach(ApplicationUser user in userManager.Users) {
         userList.Add(user);
       }
-      UserManager<ApplicationUser> userManagerLoop = userManager;
+      // correction: datareader automatically close after finishing foreach scope
+      // no need to create variables for userManager
       foreach(ApplicationUser user in userList) {
-        // need to create two variables of userManager because,
-        // IsInRoleAsync() need datareader of existing userManager object to be close first
-        if(await userManagerLoop.IsInRoleAsync(user, identityRole.Name)) {
+        if(await userManager.IsInRoleAsync(user, identityRole.Name)) {
           editRoleViewModel.Users.Add(user.UserName);
         }
       }
@@ -87,6 +83,60 @@ namespace pragim_dotNetWebApp.Controllers {
         }
         return View(model);
       }
+    }
+    [HttpGet]
+    public async Task<IActionResult> EditUsersInRole(string roleId) {
+      ViewBag.RoleId = roleId;
+      IdentityRole? identityRole = await roleManager.FindByIdAsync(roleId);
+      if(identityRole == null) {
+        ViewBag.ErrorMessage = $"Role with Id = {roleId} can not be found";
+        return View("notFound");
+      }
+      List<ApplicationUser> applicationUsers = new List<ApplicationUser>();
+      foreach(ApplicationUser user in userManager.Users) {        
+        applicationUsers.Add(user);
+      }
+      List<UserRoleViewModel> userRoleViewModels = new List<UserRoleViewModel>();
+        foreach(ApplicationUser user in applicationUsers) {
+          UserRoleViewModel userRoleViewModel = new UserRoleViewModel() {
+            UserId = user.Id,
+            UserName = user.UserName
+          };
+          if(await userManager.IsInRoleAsync(user, identityRole.Name)) {
+            userRoleViewModel.IsSelected = true;
+          } else {
+            userRoleViewModel.IsSelected = false;
+          }
+          userRoleViewModels.Add(userRoleViewModel);
+        }
+      return View(userRoleViewModels);
+    }
+    [HttpPost]
+    public async Task<IActionResult> EditUsersInRole(List<UserRoleViewModel> model, string roleId) {
+      IdentityRole? identityRole = await roleManager.FindByIdAsync(roleId);
+      if(identityRole == null) {
+        ViewBag.ErrorMessage = $"Role with Id = {roleId} can not be found";
+        return View("notFound");
+      }
+      for(int i=0; i<model.Count; i++) {
+        ApplicationUser? applicationUser = await userManager.FindByIdAsync(model[i].UserId);
+        IdentityResult identityResult = null;
+        if(model[i].IsSelected && !(await userManager.IsInRoleAsync(applicationUser,identityRole.Name))) {
+          identityResult = await userManager.AddToRoleAsync(applicationUser, identityRole.Name);
+        } else if (!(model[i].IsSelected) && await userManager.IsInRoleAsync(applicationUser, identityRole.Name)) {
+          identityResult = await userManager.RemoveFromRoleAsync(applicationUser, identityRole.Name);
+        } else { 
+          continue; 
+        }
+        if(identityResult.Succeeded) {
+          if(i < model.Count - 1) {
+            continue;
+          } else {
+            return RedirectToAction("editRole", new { id = roleId });
+          }
+        }
+      }
+      return RedirectToAction("editRole", new { id = roleId });
     }
   }
 }
