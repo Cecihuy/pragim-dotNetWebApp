@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using pragim_dotNetWebApp.Models;
 using pragim_dotNetWebApp.ViewModels;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace pragim_dotNetWebApp.Controllers {
+  [Authorize(Roles = "Admin , User")]
   public class AdministrationController : Controller {
     private readonly RoleManager<IdentityRole> roleManager;
     private readonly UserManager<ApplicationUser> userManager;
@@ -23,6 +25,7 @@ namespace pragim_dotNetWebApp.Controllers {
       return View();
     }
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateRole(CreateRoleViewModel model) {
       if(ModelState.IsValid) {
         IdentityResult identityResult = await roleManager.CreateAsync(
@@ -67,6 +70,7 @@ namespace pragim_dotNetWebApp.Controllers {
       return View(editRoleViewModel);
     }
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> EditRole(EditRoleViewModel model) {
       IdentityRole? identityRole = await roleManager.FindByIdAsync(model.Id);
       if(identityRole == null) {
@@ -112,6 +116,7 @@ namespace pragim_dotNetWebApp.Controllers {
       return View(userRoleViewModels);
     }
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> EditUsersInRole(List<UserRoleViewModel> model, string roleId) {
       IdentityRole? identityRole = await roleManager.FindByIdAsync(roleId);
       if(identityRole == null) {
