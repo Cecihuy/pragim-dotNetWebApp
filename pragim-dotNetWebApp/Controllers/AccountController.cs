@@ -39,6 +39,9 @@ namespace pragim_dotNetWebApp.Controllers {
         };
         IdentityResult identityResult = await userManager.CreateAsync(identityUser, model.Password);
         if(identityResult.Succeeded) {
+          if(signInManager.IsSignedIn(User) && User.IsInRole("Admin")) {
+            return RedirectToAction("listUsers", "administration");
+          }
           await signInManager.SignInAsync(identityUser, false);
           return RedirectToAction("index", "home");
         }

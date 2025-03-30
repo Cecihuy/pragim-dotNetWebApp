@@ -21,6 +21,11 @@ namespace pragim_dotNetWebApp.Controllers {
       this.userManager=userManager;
     }
     [HttpGet]
+    public IActionResult ListUsers() {
+      IQueryable<ApplicationUser> users = userManager.Users;
+      return View(users);
+    }
+    [HttpGet]
     public IActionResult CreateRole() {
       return View();
     }

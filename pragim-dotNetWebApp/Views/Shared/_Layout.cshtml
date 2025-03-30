@@ -8,7 +8,9 @@
   <environment include="Development">
     <link href="~/css/bootstrap5.css" rel="stylesheet" />
     <script src="~/js/jquery-3.7.0.js"></script>
-    <script src="~/js/bootstrap5.js"></script>
+    <script src="~/js/jquery.validate.js"></script>
+    <script src="~/js/jquery.validate.unobtrusive.js"></script>
+    <script src="~/js/bootstrap5.bundle.js"></script>
   </environment>
   <environment exclude="Development">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
@@ -22,7 +24,7 @@
     <script src="~/js/jquery-3.7.0.js"></script>
     <script src="~/js/jquery.validate.js"></script>
     <script src="~/js/jquery.validate.unobtrusive.js"></script>
-    <script src="~/js/bootstrap5.js"></script>
+    <script src="~/js/bootstrap5.bundle.js"></script>
   </environment>
   <link href="~/css/site.css" rel="stylesheet" />
   <title>@ViewBag.Title</title>
@@ -45,8 +47,15 @@
             <a asp-controller="home" asp-action="create" class="nav-link">Create</a>
           </li>
           @if(signInManager.IsSignedIn(User) && User.IsInRole("Admin")) {
-            <li class="nav-item">
-              <a asp-controller="administration" asp-action="listRoles" class="nav-link">Manage Roles</a>
+            <li class="dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="dropdownMenuLink" role="button"
+                 data-bs-toggle="dropdown" aria-expanded="false">Manage</a>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                <li><a class="dropdown-item" asp-action="listUsers" asp-controller="administration"
+                       >Users</a></li>
+                <li><a class="dropdown-item" asp-action="listRoles" asp-controller="administration"
+                       >Roles</a></li>
+              </ul>
             </li>
           }
         </ul>
@@ -70,7 +79,6 @@
         </ul>
       </div>
     </nav>
-
     <div>
       @RenderBody()
     </div>
