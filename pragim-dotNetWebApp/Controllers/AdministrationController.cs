@@ -5,6 +5,7 @@ using pragim_dotNetWebApp.Models;
 using pragim_dotNetWebApp.ViewModels;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace pragim_dotNetWebApp.Controllers {
@@ -24,6 +25,45 @@ namespace pragim_dotNetWebApp.Controllers {
     public IActionResult ListUsers() {
       IQueryable<ApplicationUser> users = userManager.Users;
       return View(users);
+    }
+    [HttpGet]
+    public async Task<IActionResult> EditUser(string id) {
+      ApplicationUser? applicationUser = await userManager.FindByIdAsync(id);
+      if(applicationUser == null) {
+        ViewBag.ErrorMessage = $"User with Id = {id} cannot be found";
+        return View("NotFound");
+      }
+      IList<Claim> claims = await userManager.GetClaimsAsync(applicationUser);
+      IList<string> roles = await userManager.GetRolesAsync(applicationUser);
+
+      EditUserViewModel editUserViewModel = new EditUserViewModel() {
+        Id = applicationUser.Id,
+        Email = applicationUser.Email,
+        UserName = applicationUser.UserName,
+        City = applicationUser.City,
+        Claims = claims.Select(claim => claim.Value).ToList(),
+        Roles = roles
+      };
+      return View(editUserViewModel);
+    }
+    [HttpPost]
+    public async Task<IActionResult> EditUser(EditUserViewModel model) {
+      ApplicationUser? applicationUser = await userManager.FindByIdAsync(model.Id);
+      if(applicationUser == null) {
+        ViewBag.ErrorMessage = $"User with Id = {model.Id} cannot be found";
+        return View("NotFound");
+      } else {
+        applicationUser.Email = model.Email;
+        applicationUser.UserName = model.UserName;
+        applicationUser.City = model.City;
+        IdentityResult identityResult = await userManager.UpdateAsync(applicationUser);
+        if(identityResult.Succeeded) {
+          return RedirectToAction("listUsers");
+        }
+        foreach(IdentityError error in identityResult.Errors)
+          ModelState.AddModelError("", $"{error.Code} ==> {error.Description}");
+        }
+      return View(model);
     }
     [HttpGet]
     public IActionResult CreateRole() {
