@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+using System.Linq;
 
 namespace pragim_dotNetWebApp.Models {
   public class AppDbContext : IdentityDbContext<ApplicationUser> {
@@ -10,6 +11,9 @@ namespace pragim_dotNetWebApp.Models {
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
       base.OnModelCreating(modelBuilder);
       modelBuilder.SeedEmployee();
+      foreach(IMutableForeignKey foreignKey in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys())) {
+        foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
+      }
     }
   }
 }
