@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using pragim_dotNetWebApp.Models;
 using pragim_dotNetWebApp.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -13,13 +16,16 @@ namespace pragim_dotNetWebApp.Controllers {
   public class AdministrationController : Controller {
     private readonly RoleManager<IdentityRole> roleManager;
     private readonly UserManager<ApplicationUser> userManager;
+    private readonly ILogger<AdministrationController> ilogger;
 
     public AdministrationController(
       RoleManager<IdentityRole> roleManager, 
-      UserManager<ApplicationUser> userManager
+      UserManager<ApplicationUser> userManager,
+      ILogger<AdministrationController> ilogger
     ) {
       this.roleManager=roleManager;
       this.userManager=userManager;
+      this.ilogger=ilogger;
     }
     [HttpGet]
     public IActionResult ListUsers() {
@@ -212,14 +218,22 @@ namespace pragim_dotNetWebApp.Controllers {
         ViewBag.ErrorMessage = $"Role with Id = {id} can not be found";
         return View("notFound");
       } else {
-        IdentityResult identityResult = await roleManager.DeleteAsync(identityRole);
-        if(identityResult.Succeeded) {
-          return RedirectToAction("listRoles");
+        try {
+          IdentityResult identityResult = await roleManager.DeleteAsync(identityRole);
+          if(identityResult.Succeeded) {
+            return RedirectToAction("listRoles");
+          }
+          foreach(IdentityError error in identityResult.Errors) {
+            ModelState.AddModelError("", $"{error.Code} ==> {error.Description}");
+          }
+          return View("listRoles");
+        } catch (DbUpdateException ex) {
+          ilogger.LogError($"Error deleting role : {ex}");
+          ViewBag.ErrorTitle = $"{identityRole.Name} role is in use";
+          ViewBag.ErrorMessage = $"{identityRole.Name} role cannot be deleted as there are users in this role. " +
+            $"If you want to delete this role, please remove the users from the role and then try to delete";
+          return View("error");
         }
-        foreach(IdentityError error in identityResult.Errors) {
-          ModelState.AddModelError("", $"{error.Code} ==> {error.Description}");
-        }
-        return View("listRoles");
       }
     }
   }
