@@ -188,5 +188,23 @@ namespace pragim_dotNetWebApp.Controllers {
       }
       return RedirectToAction("editRole", new { id = roleId });
     }
+    public async Task<IActionResult> DeleteUser(string id) {
+      ApplicationUser? applicationUser = await userManager.FindByIdAsync(id);
+      if(applicationUser == null) {
+        ViewBag.ErrorMessage = $"User with Id = {id} can not be found";
+        return View("notFound");
+      } else {
+        IdentityResult identityResult = await userManager.DeleteAsync(applicationUser);
+        if(identityResult.Succeeded) {
+          return RedirectToAction("listUsers");
+        }
+        foreach(IdentityError error in identityResult.Errors) {
+          ModelState.AddModelError("", $"{error.Code} ==> {error.Description}");
+        }
+        return View("listUsers");
+      }
+
+      return View();
+    }
   }
 }
