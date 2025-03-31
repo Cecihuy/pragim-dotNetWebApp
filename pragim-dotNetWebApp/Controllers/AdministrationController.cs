@@ -188,6 +188,7 @@ namespace pragim_dotNetWebApp.Controllers {
       }
       return RedirectToAction("editRole", new { id = roleId });
     }
+    [HttpPost]
     public async Task<IActionResult> DeleteUser(string id) {
       ApplicationUser? applicationUser = await userManager.FindByIdAsync(id);
       if(applicationUser == null) {
@@ -203,8 +204,6 @@ namespace pragim_dotNetWebApp.Controllers {
         }
         return View("listUsers");
       }
-
-      return View();
     }
   }
 }
