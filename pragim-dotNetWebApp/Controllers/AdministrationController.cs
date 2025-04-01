@@ -28,6 +28,51 @@ namespace pragim_dotNetWebApp.Controllers {
       this.ilogger=ilogger;
     }
     [HttpGet]
+    public async Task<IActionResult> ManageUserRoles(string userId) {
+      ViewBag.UserId = userId;
+      ApplicationUser? applicationUser = await userManager.FindByIdAsync(userId);
+      if(applicationUser == null) {
+        ViewBag.ErrorMessage = $"User with Id = {userId} cannot be found";
+        return View("NotFound");
+      }
+      List<UserRolesViewModel> model = new List<UserRolesViewModel>();
+      // correction. add ToList() instead of creating new List<>() for closing datareader :v
+      foreach(IdentityRole role in roleManager.Roles.ToList()) {
+        UserRolesViewModel userRolesViewModel = new UserRolesViewModel() {
+          RoleName = role.Name,
+          RoleId = role.Id
+        };
+        if(await userManager.IsInRoleAsync(applicationUser, role.Name)) {
+          userRolesViewModel.IsSelected = true;
+        } else {
+          userRolesViewModel.IsSelected = false;
+        }
+        model.Add(userRolesViewModel);
+      }
+      return View(model);
+    }
+    [HttpPost]
+    public async Task<IActionResult> ManageUserRoles(List<UserRolesViewModel> models, string userId) {
+      ApplicationUser? applicationUser = await userManager.FindByIdAsync(userId);
+      if(applicationUser == null) {
+        ViewBag.ErrorMessage = $"User with Id = {userId} cannot be found";
+        return View("NotFound");
+      }
+      IList<string> roles = await userManager.GetRolesAsync(applicationUser);
+      IdentityResult identityResult = await userManager.RemoveFromRolesAsync(applicationUser, roles);
+      if(!identityResult.Succeeded) {
+        ModelState.AddModelError("", "Cannot remove user existing roles");
+      }
+      identityResult = await userManager.AddToRolesAsync(applicationUser, models
+        .Where(role => role.IsSelected)
+        .Select(role => role.RoleName)
+      );
+      if(!identityResult.Succeeded) {
+        ModelState.AddModelError("", "Cannot add selected roles to user");
+      }
+      return RedirectToAction("editUser", new { Id = userId });
+    }
+    [HttpGet]
     public IActionResult ListUsers() {
       IQueryable<ApplicationUser> users = userManager.Users;
       return View(users);
@@ -107,13 +152,7 @@ namespace pragim_dotNetWebApp.Controllers {
         Id = identityRole.Id,
         RoleName = identityRole.Name
       };
-      List<ApplicationUser> userList = new List<ApplicationUser>();
-      foreach(ApplicationUser user in userManager.Users) {
-        userList.Add(user);
-      }
-      // correction: datareader automatically close after finishing foreach scope
-      // no need to create variables for userManager
-      foreach(ApplicationUser user in userList) {
+      foreach(ApplicationUser user in userManager.Users.ToList()) {
         if(await userManager.IsInRoleAsync(user, identityRole.Name)) {
           editRoleViewModel.Users.Add(user.UserName);
         }
@@ -147,12 +186,8 @@ namespace pragim_dotNetWebApp.Controllers {
         ViewBag.ErrorMessage = $"Role with Id = {roleId} can not be found";
         return View("notFound");
       }
-      List<ApplicationUser> applicationUsers = new List<ApplicationUser>();
-      foreach(ApplicationUser user in userManager.Users) {        
-        applicationUsers.Add(user);
-      }
       List<UserRoleViewModel> userRoleViewModels = new List<UserRoleViewModel>();
-        foreach(ApplicationUser user in applicationUsers) {
+        foreach(ApplicationUser user in userManager.Users.ToList()) {
           UserRoleViewModel userRoleViewModel = new UserRoleViewModel() {
             UserId = user.Id,
             UserName = user.UserName
