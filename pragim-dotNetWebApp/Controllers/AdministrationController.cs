@@ -28,6 +28,51 @@ namespace pragim_dotNetWebApp.Controllers {
       this.ilogger=ilogger;
     }
     [HttpGet]
+    public async Task<IActionResult> ManageUserClaims(string userId) {
+      ApplicationUser? applicationUser = await userManager.FindByIdAsync(userId);
+      if(applicationUser == null) {
+        ViewBag.ErrorMessage = $"User with Id = {userId} cannot be found";
+        return View("NotFound");
+      }
+      IList<Claim> claims = await userManager.GetClaimsAsync(applicationUser);
+      UserClaimsViewModel model = new UserClaimsViewModel() {
+        UserId = userId
+      };
+      foreach(Claim claim in ClaimsStore.AllClaims) {
+        UserClaim userClaim = new UserClaim() {
+          ClaimType = claim.Type
+        };
+        if(claims.Any(c => c.Type == claim.Type)) {
+          userClaim.IsSelected = true;
+        }
+        model.Claims.Add(userClaim);
+      }
+      return View(model);
+    }
+    [HttpPost]
+    public async Task<IActionResult> ManageUserClaims(UserClaimsViewModel model) {
+      ApplicationUser? applicationUser = await userManager.FindByIdAsync(model.UserId);
+      if(applicationUser == null) {
+        ViewBag.ErrorMessage = $"User with Id = {model.UserId} cannot be found";
+        return View("NotFound");
+      }
+      IList<Claim> claims = await userManager.GetClaimsAsync(applicationUser);
+      IdentityResult identityResult = await userManager.RemoveClaimsAsync(applicationUser, claims);
+      if(!identityResult.Succeeded) {
+        ModelState.AddModelError("", "Cannot remove user existing claims");
+        return View(model);
+      }
+      identityResult = await userManager.AddClaimsAsync(applicationUser, model.Claims
+        .Where(c => c.IsSelected)
+        .Select(c => new Claim(c.ClaimType, c.ClaimType))
+      );
+      if(!identityResult.Succeeded) {
+        ModelState.AddModelError("", "Cannot add selected claims to user");
+        return View(model);
+      }
+      return RedirectToAction("editUser", new { Id = model.UserId });
+    }
+    [HttpGet]
     public async Task<IActionResult> ManageUserRoles(string userId) {
       ViewBag.UserId = userId;
       ApplicationUser? applicationUser = await userManager.FindByIdAsync(userId);
