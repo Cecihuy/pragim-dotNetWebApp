@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Http;
 
 namespace pragim_dotNetWebApp {
   public class Program {
@@ -37,7 +36,7 @@ namespace pragim_dotNetWebApp {
                 .RequireClaim("Edit Role");
         });
         options.AddPolicy("EditClaimPolicy", policy => {
-          policy.RequireClaim("Edit Role");
+          policy.RequireClaim("Edit Role", "true");
         });
         options.AddPolicy("AdminRolePolicy", policy => {
           policy.RequireRole("Admin");
@@ -45,9 +44,6 @@ namespace pragim_dotNetWebApp {
         options.AddPolicy("ControllerRolePolicy", policy => {
           policy.RequireRole("Admin", "User");
         });
-      });
-      builder.Services.ConfigureApplicationCookie(options => {
-        options.AccessDeniedPath = new PathString("/Administration/AccessDenied");
       });
       /* =================================== pipeline =================================== */
       var app = builder.Build();

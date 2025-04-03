@@ -28,11 +28,6 @@ namespace pragim_dotNetWebApp.Controllers {
       this.ilogger=ilogger;
     }
     [HttpGet]
-    [AllowAnonymous]
-    public IActionResult AccessDenied() {
-      return View();
-    }
-    [HttpGet]
     public async Task<IActionResult> ManageUserClaims(string userId) {
       ApplicationUser? applicationUser = await userManager.FindByIdAsync(userId);
       if(applicationUser == null) {
@@ -47,7 +42,7 @@ namespace pragim_dotNetWebApp.Controllers {
         UserClaim userClaim = new UserClaim() {
           ClaimType = claim.Type
         };
-        if(claims.Any(c => c.Type == claim.Type)) {
+        if(claims.Any(c => c.Type == claim.Type && c.Value == "true")) {
           userClaim.IsSelected = true;
         }
         model.Claims.Add(userClaim);
@@ -69,8 +64,7 @@ namespace pragim_dotNetWebApp.Controllers {
         return View(model);
       }
       identityResult = await userManager.AddClaimsAsync(applicationUser, model.Claims
-        .Where(c => c.IsSelected)
-        .Select(c => new Claim(c.ClaimType, c.ClaimType))
+        .Select(c => new Claim(c.ClaimType, c.IsSelected ? "true" : "false"))
       );
       if(!identityResult.Succeeded) {
         ModelState.AddModelError("", "Cannot add selected claims to user");
@@ -144,7 +138,7 @@ namespace pragim_dotNetWebApp.Controllers {
         Email = applicationUser.Email,
         UserName = applicationUser.UserName,
         City = applicationUser.City,
-        Claims = claims.Select(claim => claim.Value).ToList(),
+        Claims = claims.Select(claim => claim.Type + " : " + claim.Value).ToList(),
         Roles = roles
       };
       return View(editUserViewModel);
