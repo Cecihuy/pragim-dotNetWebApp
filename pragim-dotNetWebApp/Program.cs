@@ -36,7 +36,11 @@ namespace pragim_dotNetWebApp {
                 .RequireClaim("Edit Role");
         });
         options.AddPolicy("EditClaimPolicy", policy => {
-          policy.RequireClaim("Edit Role", "true");
+          policy.RequireAssertion(context => 
+            context.User.IsInRole("Admin") &&
+            context.User.HasClaim(c => c.Type == "Edit Role" && c.Value == "true") ||
+            context.User.IsInRole("SuperAdmin")
+          );
         });
         options.AddPolicy("AdminRolePolicy", policy => {
           policy.RequireRole("Admin");
