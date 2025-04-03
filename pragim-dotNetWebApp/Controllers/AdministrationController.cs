@@ -28,6 +28,11 @@ namespace pragim_dotNetWebApp.Controllers {
       this.ilogger=ilogger;
     }
     [HttpGet]
+    [AllowAnonymous]
+    public IActionResult AccessDenied() {
+      return View();
+    }
+    [HttpGet]
     public async Task<IActionResult> ManageUserClaims(string userId) {
       ApplicationUser? applicationUser = await userManager.FindByIdAsync(userId);
       if(applicationUser == null) {

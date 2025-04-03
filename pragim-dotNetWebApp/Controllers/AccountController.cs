@@ -76,11 +76,6 @@ namespace pragim_dotNetWebApp.Controllers {
         ModelState.AddModelError("", "Invalid Login Attempt");
       }
       return View(model);
-    }
-    [HttpGet]
-    [AllowAnonymous]
-    public IActionResult AccessDenied() {
-      return View();
-    }
+    }    
   }
 }

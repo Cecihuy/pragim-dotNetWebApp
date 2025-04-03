@@ -8,18 +8,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Http;
 
 namespace pragim_dotNetWebApp {
   public class Program {
     public static void Main(string[] args) {
       /* =================================== variable =================================== */
-      //AuthorizationPolicy authorizationPolicy = new AuthorizationPolicyBuilder()
-      //  .RequireAuthenticatedUser().Build();
+      
       /* =================================== services =================================== */
       var builder = WebApplication.CreateBuilder(args);
       builder.Services.Configure<MvcOptions>(options => {
         options.EnableEndpointRouting = false;
-        //options.Filters.Add(new AuthorizeFilter(authorizationPolicy));
       });
       builder.Services.Configure<IdentityOptions>(options => {
         options.Password.RequireUppercase = false;
@@ -46,6 +45,9 @@ namespace pragim_dotNetWebApp {
         options.AddPolicy("ControllerRolePolicy", policy => {
           policy.RequireRole("Admin", "User");
         });
+      });
+      builder.Services.ConfigureApplicationCookie(options => {
+        options.AccessDeniedPath = new PathString("/Administration/AccessDenied");
       });
       /* =================================== pipeline =================================== */
       var app = builder.Build();
