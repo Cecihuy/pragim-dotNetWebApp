@@ -292,6 +292,7 @@ namespace pragim_dotNetWebApp.Controllers {
       }
     }
     [HttpPost]
+    [Authorize(Policy = "DeleteRolePolicy")]
     public async Task<IActionResult> DeleteRole(string id) {
       IdentityRole? identityRole = await roleManager.FindByIdAsync(id);
       if(identityRole == null) {

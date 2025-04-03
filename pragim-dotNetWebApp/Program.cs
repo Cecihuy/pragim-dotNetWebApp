@@ -34,6 +34,12 @@ namespace pragim_dotNetWebApp {
       });
       builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
         .AddEntityFrameworkStores<AppDbContext>();
+      builder.Services.AddAuthorization(options => {
+        options.AddPolicy("DeleteRolePolicy", policy => {
+          policy.RequireClaim("Delete Role")
+                .RequireClaim("Edit Role");
+        });
+      });
       /* =================================== pipeline =================================== */
       var app = builder.Build();
       if(app.Environment.IsDevelopment()) { 
