@@ -12,7 +12,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace pragim_dotNetWebApp.Controllers {
-  [Authorize(Roles = "Admin , User")]
+  [Authorize(Policy = "ControllerRolePolicy")]
   public class AdministrationController : Controller {
     private readonly RoleManager<IdentityRole> roleManager;
     private readonly UserManager<ApplicationUser> userManager;
@@ -50,6 +50,7 @@ namespace pragim_dotNetWebApp.Controllers {
       return View(model);
     }
     [HttpPost]
+    [Authorize(Policy = "AdminRolePolicy")]
     public async Task<IActionResult> ManageUserClaims(UserClaimsViewModel model) {
       ApplicationUser? applicationUser = await userManager.FindByIdAsync(model.UserId);
       if(applicationUser == null) {
@@ -97,6 +98,7 @@ namespace pragim_dotNetWebApp.Controllers {
       return View(model);
     }
     [HttpPost]
+    [Authorize(Policy = "AdminRolePolicy")]
     public async Task<IActionResult> ManageUserRoles(List<UserRolesViewModel> models, string userId) {
       ApplicationUser? applicationUser = await userManager.FindByIdAsync(userId);
       if(applicationUser == null) {
@@ -143,6 +145,7 @@ namespace pragim_dotNetWebApp.Controllers {
       return View(editUserViewModel);
     }
     [HttpPost]
+    [Authorize(Policy = "AdminRolePolicy")]
     public async Task<IActionResult> EditUser(EditUserViewModel model) {
       ApplicationUser? applicationUser = await userManager.FindByIdAsync(model.Id);
       if(applicationUser == null) {
@@ -166,7 +169,7 @@ namespace pragim_dotNetWebApp.Controllers {
       return View();
     }
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "AdminRolePolicy")]
     public async Task<IActionResult> CreateRole(CreateRoleViewModel model) {
       if(ModelState.IsValid) {
         IdentityResult identityResult = await roleManager.CreateAsync(
@@ -205,7 +208,7 @@ namespace pragim_dotNetWebApp.Controllers {
       return View(editRoleViewModel);
     }
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "AdminRolePolicy")]
     public async Task<IActionResult> EditRole(EditRoleViewModel model) {
       IdentityRole? identityRole = await roleManager.FindByIdAsync(model.Id);
       if(identityRole == null) {
@@ -247,7 +250,7 @@ namespace pragim_dotNetWebApp.Controllers {
       return View(userRoleViewModels);
     }
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "AdminRolePolicy")]
     public async Task<IActionResult> EditUsersInRole(List<UserRoleViewModel> model, string roleId) {
       IdentityRole? identityRole = await roleManager.FindByIdAsync(roleId);
       if(identityRole == null) {
@@ -275,6 +278,7 @@ namespace pragim_dotNetWebApp.Controllers {
       return RedirectToAction("editRole", new { id = roleId });
     }
     [HttpPost]
+    [Authorize(Policy = "DeleteClaimPolicy")]
     public async Task<IActionResult> DeleteUser(string id) {
       ApplicationUser? applicationUser = await userManager.FindByIdAsync(id);
       if(applicationUser == null) {
@@ -292,7 +296,7 @@ namespace pragim_dotNetWebApp.Controllers {
       }
     }
     [HttpPost]
-    [Authorize(Policy = "DeleteRolePolicy")]
+    [Authorize(Policy = "DeleteClaimPolicy")]
     public async Task<IActionResult> DeleteRole(string id) {
       IdentityRole? identityRole = await roleManager.FindByIdAsync(id);
       if(identityRole == null) {

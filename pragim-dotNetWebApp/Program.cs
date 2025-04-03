@@ -8,20 +8,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Authorization;
 
 namespace pragim_dotNetWebApp {
   public class Program {
     public static void Main(string[] args) {
       /* =================================== variable =================================== */
-      AuthorizationPolicy authorizationPolicy = new AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser().Build();
+      //AuthorizationPolicy authorizationPolicy = new AuthorizationPolicyBuilder()
+      //  .RequireAuthenticatedUser().Build();
       /* =================================== services =================================== */
       var builder = WebApplication.CreateBuilder(args);
       builder.Services.Configure<MvcOptions>(options => {
         options.EnableEndpointRouting = false;
-        options.Filters.Add(new AuthorizeFilter(authorizationPolicy));
+        //options.Filters.Add(new AuthorizeFilter(authorizationPolicy));
       });
       builder.Services.Configure<IdentityOptions>(options => {
         options.Password.RequireUppercase = false;
@@ -35,9 +33,15 @@ namespace pragim_dotNetWebApp {
       builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
         .AddEntityFrameworkStores<AppDbContext>();
       builder.Services.AddAuthorization(options => {
-        options.AddPolicy("DeleteRolePolicy", policy => {
+        options.AddPolicy("DeleteClaimPolicy", policy => {
           policy.RequireClaim("Delete Role")
                 .RequireClaim("Edit Role");
+        });
+        options.AddPolicy("AdminRolePolicy", policy => {
+          policy.RequireRole("Admin");
+        });
+        options.AddPolicy("ControllerRolePolicy", policy => {
+          policy.RequireRole("Admin", "User");
         });
       });
       /* =================================== pipeline =================================== */
