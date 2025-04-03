@@ -37,6 +37,9 @@ namespace pragim_dotNetWebApp {
           policy.RequireClaim("Delete Role")
                 .RequireClaim("Edit Role");
         });
+        options.AddPolicy("EditClaimPolicy", policy => {
+          policy.RequireClaim("Edit Role");
+        });
         options.AddPolicy("AdminRolePolicy", policy => {
           policy.RequireRole("Admin");
         });

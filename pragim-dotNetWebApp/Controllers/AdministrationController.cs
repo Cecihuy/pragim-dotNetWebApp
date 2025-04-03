@@ -190,6 +190,7 @@ namespace pragim_dotNetWebApp.Controllers {
       return View(roles);
     }
     [HttpGet]
+    [Authorize(Policy = "EditClaimPolicy")]
     public async Task<IActionResult> EditRole(string id) {
       IdentityRole? identityRole = await roleManager.FindByIdAsync(id);
       if(identityRole == null) {
@@ -208,7 +209,7 @@ namespace pragim_dotNetWebApp.Controllers {
       return View(editRoleViewModel);
     }
     [HttpPost]
-    [Authorize(Policy = "AdminRolePolicy")]
+    [Authorize(Policy = "EditClaimPolicy")]
     public async Task<IActionResult> EditRole(EditRoleViewModel model) {
       IdentityRole? identityRole = await roleManager.FindByIdAsync(model.Id);
       if(identityRole == null) {
