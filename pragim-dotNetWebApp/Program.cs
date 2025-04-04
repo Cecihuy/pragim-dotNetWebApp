@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
+using pragim_dotNetWebApp.Security;
 
 namespace pragim_dotNetWebApp {
   public class Program {
@@ -36,11 +38,7 @@ namespace pragim_dotNetWebApp {
                 .RequireClaim("Edit Role");
         });
         options.AddPolicy("EditClaimPolicy", policy => {
-          policy.RequireAssertion(context => 
-            context.User.IsInRole("Admin") &&
-            context.User.HasClaim(c => c.Type == "Edit Role" && c.Value == "true") ||
-            context.User.IsInRole("SuperAdmin")
-          );
+          policy.AddRequirements(new ManageAdminRolesAndClaimsRequirement());
         });
         options.AddPolicy("AdminRolePolicy", policy => {
           policy.RequireRole("Admin");
@@ -49,6 +47,7 @@ namespace pragim_dotNetWebApp {
           policy.RequireRole("Admin", "User");
         });
       });
+      builder.Services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
       /* =================================== pipeline =================================== */
       var app = builder.Build();
       if(app.Environment.IsDevelopment()) { 

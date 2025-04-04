@@ -73,6 +73,7 @@ namespace pragim_dotNetWebApp.Controllers {
       return RedirectToAction("editUser", new { Id = model.UserId });
     }
     [HttpGet]
+    [Authorize(Policy = "EditClaimPolicy")]
     public async Task<IActionResult> ManageUserRoles(string userId) {
       ViewBag.UserId = userId;
       ApplicationUser? applicationUser = await userManager.FindByIdAsync(userId);
@@ -97,7 +98,7 @@ namespace pragim_dotNetWebApp.Controllers {
       return View(model);
     }
     [HttpPost]
-    [Authorize(Policy = "AdminRolePolicy")]
+    [Authorize(Policy = "EditClaimPolicy")]
     public async Task<IActionResult> ManageUserRoles(List<UserRolesViewModel> models, string userId) {
       ApplicationUser? applicationUser = await userManager.FindByIdAsync(userId);
       if(applicationUser == null) {
@@ -189,7 +190,6 @@ namespace pragim_dotNetWebApp.Controllers {
       return View(roles);
     }
     [HttpGet]
-    [Authorize(Policy = "EditClaimPolicy")]
     public async Task<IActionResult> EditRole(string id) {
       IdentityRole? identityRole = await roleManager.FindByIdAsync(id);
       if(identityRole == null) {
@@ -208,7 +208,6 @@ namespace pragim_dotNetWebApp.Controllers {
       return View(editRoleViewModel);
     }
     [HttpPost]
-    [Authorize(Policy = "EditClaimPolicy")]
     public async Task<IActionResult> EditRole(EditRoleViewModel model) {
       IdentityRole? identityRole = await roleManager.FindByIdAsync(model.Id);
       if(identityRole == null) {
