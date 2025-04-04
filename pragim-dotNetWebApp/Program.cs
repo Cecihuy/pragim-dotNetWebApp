@@ -48,6 +48,7 @@ namespace pragim_dotNetWebApp {
         });
       });
       builder.Services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
+      builder.Services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
       /* =================================== pipeline =================================== */
       var app = builder.Build();
       if(app.Environment.IsDevelopment()) { 
