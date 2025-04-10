@@ -49,6 +49,11 @@ namespace pragim_dotNetWebApp {
       });
       builder.Services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
       builder.Services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
+      builder.Services.AddAuthentication()
+        .AddGoogle(options => {
+          options.ClientId = "521539481171-4lpu5hcppe2laf360m3q81i57k2gbc5j.apps.googleusercontent.com";
+          options.ClientSecret = "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";
+        });
       /* =================================== pipeline =================================== */
       var app = builder.Build();
       if(app.Environment.IsDevelopment()) { 

@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using pragim_dotNetWebApp.Models;
 using pragim_dotNetWebApp.ViewModels;
+using System.Linq;
 using System.Threading.Tasks;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
@@ -57,8 +59,12 @@ namespace pragim_dotNetWebApp.Controllers {
       return RedirectToAction("index", "home");
     }
     [HttpGet][AllowAnonymous]
-    public IActionResult Login() {
-      return View("login");
+    public async Task<IActionResult> Login(string? returnUrl) {
+      LoginViewModel loginViewModel = new LoginViewModel() {
+        ReturnUrl = returnUrl,
+        ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
+      };
+      return View(loginViewModel);
     }
     [HttpPost][AllowAnonymous]
     public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl) {
@@ -76,6 +82,15 @@ namespace pragim_dotNetWebApp.Controllers {
         ModelState.AddModelError("", "Invalid Login Attempt");
       }
       return View(model);
+    }
+    [AllowAnonymous]
+    [HttpPost]
+    public IActionResult ExternalLogin(string provider, string returnUrl) {
+      string? redirectUrl = 
+        Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
+      AuthenticationProperties authenticationProperties = 
+        signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+      return new ChallengeResult(provider, authenticationProperties);
     }
     [HttpGet]
     [AllowAnonymous]
