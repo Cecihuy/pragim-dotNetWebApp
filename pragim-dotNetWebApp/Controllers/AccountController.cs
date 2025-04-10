@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using pragim_dotNetWebApp.Models;
 using pragim_dotNetWebApp.ViewModels;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
@@ -91,6 +92,52 @@ namespace pragim_dotNetWebApp.Controllers {
       AuthenticationProperties authenticationProperties = 
         signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
       return new ChallengeResult(provider, authenticationProperties);
+    }
+    [AllowAnonymous]
+    public async Task<IActionResult> ExternalLoginCallback(
+      string returnUrl = null,
+      string remoteError = null
+    ) {
+      returnUrl = returnUrl ?? Url.Content("~/");
+      LoginViewModel loginViewModel = new LoginViewModel() {
+        ReturnUrl = returnUrl,
+        ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
+      };
+      if(remoteError != null) {
+        ModelState.AddModelError(string.Empty, $"Error from external provider: {remoteError}");
+        return View("Login", loginViewModel);
+      }
+      ExternalLoginInfo? externalLoginInfo = await signInManager.GetExternalLoginInfoAsync();
+      if(externalLoginInfo == null) {
+        ModelState.AddModelError(string.Empty, "Error loading external login information");
+        return View("Login", loginViewModel);
+      }
+      SignInResult signInResult = await signInManager.ExternalLoginSignInAsync(
+        externalLoginInfo.LoginProvider, 
+        externalLoginInfo.ProviderKey, 
+        false, true
+      );
+      if(signInResult.Succeeded) {
+        return LocalRedirect(returnUrl);
+      } else {
+        string? emailClaim = externalLoginInfo.Principal.FindFirstValue(ClaimTypes.Email);
+        if(emailClaim != null) {
+          ApplicationUser? applicationUser = await userManager.FindByEmailAsync(emailClaim);
+          if(applicationUser == null) {
+            applicationUser = new ApplicationUser () {
+              UserName = externalLoginInfo.Principal.FindFirstValue(ClaimTypes.Email),
+              Email = externalLoginInfo.Principal.FindFirstValue(ClaimTypes.Email)
+            };
+            await userManager.CreateAsync(applicationUser);
+          }
+          await userManager.AddLoginAsync(applicationUser, externalLoginInfo);
+          await signInManager.SignInAsync(applicationUser, false);
+          return LocalRedirect(returnUrl);
+        }
+        ViewBag.ErrorTitle = $"Email claim not received from: {externalLoginInfo.LoginProvider}";
+        ViewBag.ErrorMessage = "Please contact support on Pragim@PragimTech.com";
+        return View("error");
+      }
     }
     [HttpGet]
     [AllowAnonymous]

@@ -53,6 +53,7 @@ namespace pragim_dotNetWebApp {
         .AddGoogle(options => {
           options.ClientId = "521539481171-4lpu5hcppe2laf360m3q81i57k2gbc5j.apps.googleusercontent.com";
           options.ClientSecret = "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";
+          options.CallbackPath = "/easylogin";
         });
       /* =================================== pipeline =================================== */
       var app = builder.Build();
