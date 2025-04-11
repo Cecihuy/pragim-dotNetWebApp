@@ -42,7 +42,7 @@
           <div>
             @foreach(AuthenticationScheme provider in Model.ExternalLogins) {
               <button type="submit" class="btn btn-primary" name="provider" value="@provider.DisplayName"
-                title="Login using your @provider.DisplayName account">@provider.DisplayName</button>
+                title="Login using your @provider.DisplayName account" style="width:auto">@provider.DisplayName</button>
             }
           </div>
         </form>

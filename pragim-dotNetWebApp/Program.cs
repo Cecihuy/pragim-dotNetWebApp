@@ -54,6 +54,11 @@ namespace pragim_dotNetWebApp {
           options.ClientId = "521539481171-4lpu5hcppe2laf360m3q81i57k2gbc5j.apps.googleusercontent.com";
           options.ClientSecret = "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";
           options.CallbackPath = "/easylogin";
+        })
+        .AddFacebook(options => {
+          options.AppId = "1181799203589679";
+          options.AppSecret = "b020be69f06354ab52ab5d296774fb74";
+          //options.CallbackPath = "/easylogin";
         });
       /* =================================== pipeline =================================== */
       var app = builder.Build();
