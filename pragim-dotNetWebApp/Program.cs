@@ -58,7 +58,11 @@ namespace pragim_dotNetWebApp {
         .AddFacebook(options => {
           options.AppId = "1181799203589679";
           options.AppSecret = "b020be69f06354ab52ab5d296774fb74";
-          //options.CallbackPath = "/easylogin";
+        })
+        .AddTwitter(options => {
+          options.ConsumerKey = "CJuuWqODcLsAMrzGmvAUdBdWU";
+          options.ConsumerSecret = "LInXolyl0EVY5EAyKZEmBDByKdOs6RqlUcD0r2DfEeV1GRSCJM";
+          options.RetrieveUserDetails = true;
         });
       /* =================================== pipeline =================================== */
       var app = builder.Build();
