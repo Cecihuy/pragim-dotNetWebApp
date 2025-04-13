@@ -161,6 +161,18 @@ namespace pragim_dotNetWebApp.Controllers {
               Email = externalLoginInfo.Principal.FindFirstValue(ClaimTypes.Email)
             };
             await userManager.CreateAsync(applicationUser);
+            string token = await userManager.GenerateEmailConfirmationTokenAsync(applicationUser);
+            string? confirmationLink = Url.Action(
+              "ConfirmEmail",
+              "Account",
+              new { UserId = applicationUser.Id, Token = token },
+              Request.Scheme
+            );
+            logger.Log(LogLevel.Warning, confirmationLink);
+            ViewBag.ErrorTitle = "Registration Successfull";
+            ViewBag.ErrorMessage = "Before you can login, please confirm your " +
+              "email, by clicking on the confirmation link we have emailed you";
+            return View("Error");
           }
           await userManager.AddLoginAsync(applicationUser, externalLoginInfo);
           await signInManager.SignInAsync(applicationUser, false);
