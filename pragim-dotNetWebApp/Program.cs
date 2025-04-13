@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using pragim_dotNetWebApp.Security;
+using System;
 
 namespace pragim_dotNetWebApp {
   public class Program {
@@ -25,6 +26,9 @@ namespace pragim_dotNetWebApp {
         options.Password.RequireUppercase = false;
         options.Password.RequireDigit = false;
         options.SignIn.RequireConfirmedEmail = true;
+      });
+      builder.Services.Configure<DataProtectionTokenProviderOptions>(options => {
+        options.TokenLifespan = TimeSpan.FromMinutes(1);
       });
       builder.Services.AddMvc();
       builder.Services.AddScoped<IEmployeeRepository, SqlEmployeeRepository>();
