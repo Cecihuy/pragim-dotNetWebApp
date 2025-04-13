@@ -203,6 +203,29 @@ namespace pragim_dotNetWebApp.Controllers {
     }
     [HttpGet]
     [AllowAnonymous]
+    public IActionResult ForgotPassword() {
+      return View();
+    }
+    [HttpPost]
+    [AllowAnonymous]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model) {
+      if(ModelState.IsValid) {
+        ApplicationUser? applicationUser = await userManager.FindByEmailAsync(model.Email);
+        if(applicationUser != null && await userManager.IsEmailConfirmedAsync(applicationUser)) {
+          string token = await userManager.GeneratePasswordResetTokenAsync(applicationUser);
+          string? passwordResetLink = Url.Action(
+            "ResetPassword", 
+            "Account",
+            new { Email = model.Email, Token = token }, Request.Scheme);
+          logger.Log(LogLevel.Warning, passwordResetLink);
+          return View("ForgotPasswordConfirmation");
+        }
+        return View("ForgotPasswordConfirmation");
+      }
+    return View(model);
+    }
+    [HttpGet]
+    [AllowAnonymous]
     public IActionResult AccessDenied() {
       return View();
     }
