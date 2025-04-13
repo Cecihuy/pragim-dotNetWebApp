@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <RootNamespace>pragim_dotNetWebApp</RootNamespace>
+    <UserSecretsId>6c912fb2-4725-479b-b376-66fcf2cffc76</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
