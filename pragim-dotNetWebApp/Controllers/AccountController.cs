@@ -2,12 +2,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using pragim_dotNetWebApp.Models;
 using pragim_dotNetWebApp.ViewModels;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace pragim_dotNetWebApp.Controllers {
@@ -224,6 +226,33 @@ namespace pragim_dotNetWebApp.Controllers {
       }
     return View(model);
     }
+    [HttpGet]
+    [AllowAnonymous]
+    public IActionResult ResetPassword(string token, string email) {
+      if(token == null || email == null) {
+        ModelState.AddModelError(string.Empty, "Invalid password reset token");
+      }
+      return View();
+    }
+    [HttpPost]
+    [AllowAnonymous]
+    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model) {
+      if(ModelState.IsValid) {
+        ApplicationUser? applicationUser = await userManager.FindByEmailAsync(model.Email);
+        if(applicationUser != null) {
+          IdentityResult identityResult = await userManager.ResetPasswordAsync(applicationUser, model.Token, model.Password);
+          if(identityResult.Succeeded) {
+            return View("ResetPasswordConfirmation");
+          }
+          foreach(IdentityError error in identityResult.Errors) {
+            ModelState.AddModelError(string.Empty, $"{error.Code} ==> {error.Description}");
+          }
+          return View(model);
+        }
+        return View("ResetPasswordConfirmation");
+      } 
+      return View(model);
+    }  
     [HttpGet]
     [AllowAnonymous]
     public IActionResult AccessDenied() {
