@@ -24,6 +24,7 @@ namespace pragim_dotNetWebApp {
       builder.Services.Configure<IdentityOptions>(options => {
         options.Password.RequireUppercase = false;
         options.Password.RequireDigit = false;
+        options.SignIn.RequireConfirmedEmail = true;
       });
       builder.Services.AddMvc();
       builder.Services.AddScoped<IEmployeeRepository, SqlEmployeeRepository>();

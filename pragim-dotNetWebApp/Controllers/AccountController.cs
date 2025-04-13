@@ -69,7 +69,17 @@ namespace pragim_dotNetWebApp.Controllers {
     }
     [HttpPost][AllowAnonymous]
     public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl) {
+      model.ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
       if(ModelState.IsValid) {
+        ApplicationUser? applicationUser = await userManager.FindByEmailAsync(model.Email);
+        if(
+          applicationUser != null && 
+          !applicationUser.EmailConfirmed &&
+          (await userManager.CheckPasswordAsync(applicationUser, model.Password))
+        ) {
+          ModelState.AddModelError(string.Empty, "Email not confirmed yet");
+          return View(model);
+        }
         SignInResult signInResult = await signInManager.PasswordSignInAsync(
           model.Email, model.Password, model.RememberMe, false
         );
@@ -112,6 +122,15 @@ namespace pragim_dotNetWebApp.Controllers {
         ModelState.AddModelError(string.Empty, "Error loading external login information");
         return View("Login", loginViewModel);
       }
+      string? emailClaim = externalLoginInfo.Principal.FindFirstValue(ClaimTypes.Email);
+      ApplicationUser? applicationUser = null;
+      if(emailClaim != null) {
+        applicationUser = await userManager.FindByEmailAsync(emailClaim);
+        if(applicationUser != null && !applicationUser.EmailConfirmed) {
+          ModelState.AddModelError(string.Empty, "Email not confirmed yet");
+          return View("Login", loginViewModel);
+        }
+      }
       SignInResult signInResult = await signInManager.ExternalLoginSignInAsync(
         externalLoginInfo.LoginProvider, 
         externalLoginInfo.ProviderKey, 
@@ -120,9 +139,8 @@ namespace pragim_dotNetWebApp.Controllers {
       if(signInResult.Succeeded) {
         return LocalRedirect(returnUrl);
       } else {
-        string? emailClaim = externalLoginInfo.Principal.FindFirstValue(ClaimTypes.Email);
+        
         if(emailClaim != null) {
-          ApplicationUser? applicationUser = await userManager.FindByEmailAsync(emailClaim);
           if(applicationUser == null) {
             applicationUser = new ApplicationUser () {
               UserName = externalLoginInfo.Principal.FindFirstValue(ClaimTypes.Email),
