@@ -32,7 +32,8 @@ namespace pragim_dotNetWebApp {
         options.UseSqlServer(builder.Configuration.GetConnectionString("EmployeeApp"));
       });
       builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-        .AddEntityFrameworkStores<AppDbContext>();
+        .AddEntityFrameworkStores<AppDbContext>()
+        .AddDefaultTokenProviders();
       builder.Services.AddAuthorization(options => {
         options.AddPolicy("DeleteClaimPolicy", policy => {
           policy.RequireClaim("Delete Role")

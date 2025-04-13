@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using pragim_dotNetWebApp.Models;
 using pragim_dotNetWebApp.ViewModels;
 using System.Linq;
@@ -13,13 +14,16 @@ namespace pragim_dotNetWebApp.Controllers {
   public class AccountController : Controller {
     private readonly UserManager<ApplicationUser> userManager;
     private readonly SignInManager<ApplicationUser> signInManager;
+    private readonly ILogger<AccountController> logger;
 
     public AccountController(
       UserManager<ApplicationUser> userManager, 
-      SignInManager<ApplicationUser> signInManager
+      SignInManager<ApplicationUser> signInManager,
+      ILogger<AccountController> logger
     ) {
       this.userManager=userManager;
       this.signInManager=signInManager;
+      this.logger=logger;
     }
     [HttpGet][AllowAnonymous]
     public IActionResult Register() {
@@ -42,11 +46,21 @@ namespace pragim_dotNetWebApp.Controllers {
         };
         IdentityResult identityResult = await userManager.CreateAsync(identityUser, model.Password);
         if(identityResult.Succeeded) {
+          string token = await userManager.GenerateEmailConfirmationTokenAsync(identityUser);
+          string? confirmationLink = Url.Action(
+            "ConfirmEmail",
+            "Account", 
+            new { UserId = identityUser.Id, Token = token }, 
+            Request.Scheme
+          );
+          logger.Log(LogLevel.Warning, confirmationLink);
           if(signInManager.IsSignedIn(User) && User.IsInRole("Admin")) {
             return RedirectToAction("listUsers", "administration");
           }
-          await signInManager.SignInAsync(identityUser, false);
-          return RedirectToAction("index", "home");
+          ViewBag.ErrorTitle = "Registration Successfull";
+          ViewBag.ErrorMessage = "Before you can login, please confirm your " +
+            "email, by clicking on the confirmation link we have emailed you";
+          return View("Error");
         }
         foreach(IdentityError error in identityResult.Errors) {
           ModelState.AddModelError("", $"{error.Code}, {error.Description}");
@@ -156,6 +170,24 @@ namespace pragim_dotNetWebApp.Controllers {
         ViewBag.ErrorMessage = "Please contact support on Pragim@PragimTech.com";
         return View("error");
       }
+    }
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<IActionResult> ConfirmEmail(string userId, string token) {
+      if(userId == null || token == null) {
+        RedirectToAction("Index", "Home");
+      }
+      ApplicationUser? applicationUser = await userManager.FindByIdAsync(userId);
+      if(applicationUser == null) {
+        ViewBag.ErrorMessage = $"The user id {userId} is invalid";
+        return View("NotFound");
+      }
+      IdentityResult identityResult = await userManager.ConfirmEmailAsync(applicationUser, token);
+      if(identityResult.Succeeded) {
+        return View();
+      }
+      ViewBag.ErrorTitle = "Email cannot be confirmed";
+      return View("Error");
     }
     [HttpGet]
     [AllowAnonymous]
