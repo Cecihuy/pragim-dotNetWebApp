@@ -77,6 +77,7 @@ namespace pragim_dotNetWebApp {
           options.ConsumerSecret = "LInXolyl0EVY5EAyKZEmBDByKdOs6RqlUcD0r2DfEeV1GRSCJM";
           options.RetrieveUserDetails = true;
         });
+      builder.Services.AddSingleton<DataProtectionPurposeStrings>();
       /* =================================== pipeline =================================== */
       var app = builder.Build();
       if(app.Environment.IsDevelopment()) { 

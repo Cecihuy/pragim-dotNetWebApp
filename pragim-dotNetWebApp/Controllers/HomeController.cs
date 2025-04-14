@@ -1,12 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using pragim_dotNetWebApp.Models;
+using pragim_dotNetWebApp.Security;
 using pragim_dotNetWebApp.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace pragim_dotNetWebApp.Controllers {
   [Authorize]
@@ -14,23 +17,31 @@ namespace pragim_dotNetWebApp.Controllers {
     private readonly IEmployeeRepository _employeeRepository;
     private readonly IHostEnvironment hostEnvironment;
     private readonly ILogger<HomeController> logger;
+    private readonly IDataProtector protector;
 
     public HomeController(
       IEmployeeRepository employeeRepository, 
       IHostEnvironment hostEnvironment,
-      ILogger<HomeController> logger
+      ILogger<HomeController> logger,
+      IDataProtectionProvider dataProtectionProvider,
+      DataProtectionPurposeStrings dataProtectionPurposeStrings
     ) {
       _employeeRepository = employeeRepository;
       this.hostEnvironment=hostEnvironment;
       this.logger=logger;
+      protector = dataProtectionProvider.CreateProtector(dataProtectionPurposeStrings.EmployeeIdRouteValue);
     }
     [AllowAnonymous]
     public ViewResult Index() {
-      IEnumerable<Employee> model = _employeeRepository.GetAllEmployee();
+      IEnumerable<Employee> model = _employeeRepository.GetAllEmployee()
+        .Select(e => {
+          e.EncryptedId = protector.Protect(e.Id.ToString());
+          return e;
+        });
       return View(model);
     }
     [AllowAnonymous]
-    public ViewResult Details(int? id) {
+    public ViewResult Details(string? id) {
       logger.LogTrace("Trace Log");
       logger.LogDebug("Debug Log");
       logger.LogInformation("Information Log");
@@ -38,10 +49,11 @@ namespace pragim_dotNetWebApp.Controllers {
       logger.LogError("Error Log");
       logger.LogCritical("Critical Log");
       //throw new Exception("error in details");
-      Employee employee = _employeeRepository.GetEmployee(id.Value);
+      int employeeId = Convert.ToInt32(protector.Unprotect(id));
+      Employee employee = _employeeRepository.GetEmployee(employeeId);
       if(employee == null) {
         Response.StatusCode = 404;
-        return View("EmployeeNotFound", id.Value);
+        return View("EmployeeNotFound", employeeId);
       }
       HomeDetailsViewModel homeDetailsViewModel = new HomeDetailsViewModel {
         Employee = employee,

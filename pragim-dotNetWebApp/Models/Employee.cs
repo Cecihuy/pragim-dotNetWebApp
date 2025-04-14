@@ -1,8 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace pragim_dotNetWebApp.Models {
   public class Employee {
     public int Id { get; set; }
+    [NotMapped]
+    public string EncryptedId { get; set; }
     [Required]
     public string Name { get; set; }
     [Required]
