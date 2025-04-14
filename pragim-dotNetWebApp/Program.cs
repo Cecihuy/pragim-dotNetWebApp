@@ -26,9 +26,13 @@ namespace pragim_dotNetWebApp {
         options.Password.RequireUppercase = false;
         options.Password.RequireDigit = false;
         options.SignIn.RequireConfirmedEmail = true;
+        options.Tokens.EmailConfirmationTokenProvider = "CustomEmailConfirmation";
       });
       builder.Services.Configure<DataProtectionTokenProviderOptions>(options => {
         options.TokenLifespan = TimeSpan.FromMinutes(1);
+      });
+      builder.Services.Configure<CustomEmailConfirmationTokenProviderOptions>(options => {
+        options.TokenLifespan = TimeSpan.FromMinutes(3);
       });
       builder.Services.AddMvc();
       builder.Services.AddScoped<IEmployeeRepository, SqlEmployeeRepository>();
@@ -37,7 +41,10 @@ namespace pragim_dotNetWebApp {
       });
       builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
         .AddEntityFrameworkStores<AppDbContext>()
-        .AddDefaultTokenProviders();
+        .AddDefaultTokenProviders()
+        .AddTokenProvider<CustomEmailConfirmationTokenProvider<ApplicationUser>>(
+          "CustomEmailConfirmation"
+        );
       builder.Services.AddAuthorization(options => {
         options.AddPolicy("DeleteClaimPolicy", policy => {
           policy.RequireClaim("Delete Role")
