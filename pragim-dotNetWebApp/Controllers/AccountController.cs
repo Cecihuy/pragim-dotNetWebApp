@@ -13,6 +13,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace pragim_dotNetWebApp.Controllers {
+  [Authorize(Policy = "ControllerRolePolicy")]
   public class AccountController : Controller {
     private readonly UserManager<ApplicationUser> userManager;
     private readonly SignInManager<ApplicationUser> signInManager;
@@ -26,6 +27,31 @@ namespace pragim_dotNetWebApp.Controllers {
       this.userManager=userManager;
       this.signInManager=signInManager;
       this.logger=logger;
+    }
+    [HttpGet]
+    public IActionResult ChangePassword() {
+      return View();
+    }
+    [HttpPost]
+    public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model) {
+      if(ModelState.IsValid) {
+        ApplicationUser? applicationUser = await userManager.GetUserAsync(User);
+        if(applicationUser == null) {
+          return RedirectToAction("Login");
+        }
+        IdentityResult identityResult = await userManager.ChangePasswordAsync(
+          applicationUser, model.CurrentPassword, model.NewPassword
+        );
+        if(!identityResult.Succeeded) {
+          foreach(IdentityError error in identityResult.Errors) {
+            ModelState.AddModelError(string.Empty, $"{error.Code} ==> {error.Description}");
+          }
+          return View();
+        }
+        await signInManager.RefreshSignInAsync(applicationUser);
+        return View("ChangePasswordConfirmation");
+      }
+      return View(model);
     }
     [HttpGet][AllowAnonymous]
     public IActionResult Register() {

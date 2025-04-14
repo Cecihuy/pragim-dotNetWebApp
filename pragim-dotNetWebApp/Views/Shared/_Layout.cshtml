@@ -51,10 +51,15 @@
               <a class="nav-link dropdown-toggle" href="#" id="dropdownMenuLink" role="button"
                  data-bs-toggle="dropdown" aria-expanded="false">Manage</a>
               <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                <li><a class="dropdown-item" asp-action="listUsers" asp-controller="administration"
-                       >Users</a></li>
-                <li><a class="dropdown-item" asp-action="listRoles" asp-controller="administration"
-                       >Roles</a></li>
+                <li>
+                  <a class="dropdown-item" asp-action="listUsers" asp-controller="administration">Users</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" asp-action="listRoles" asp-controller="administration">Roles</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" asp-action="changePassword" asp-controller="account">Password</a>
+                </li>
               </ul>
             </li>
           }

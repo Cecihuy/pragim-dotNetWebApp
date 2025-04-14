@@ -35,9 +35,9 @@ namespace pragim_dotNetWebApp.Controllers {
     public ViewResult Index() {
       IEnumerable<Employee> model = _employeeRepository.GetAllEmployee()
         .Select(e => {
-          e.EncryptedId = protector.Protect(e.Id.ToString());
-          return e;
-        });
+           e.EncryptedId = protector.Protect(e.Id.ToString());
+           return e;
+         });
       return View(model);
     }
     [AllowAnonymous]
