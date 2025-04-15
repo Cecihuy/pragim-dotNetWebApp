@@ -27,6 +27,8 @@ namespace pragim_dotNetWebApp {
         options.Password.RequireDigit = false;
         options.SignIn.RequireConfirmedEmail = true;
         options.Tokens.EmailConfirmationTokenProvider = "CustomEmailConfirmation";
+        options.Lockout.MaxFailedAccessAttempts = 3;
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(3);
       });
       builder.Services.Configure<DataProtectionTokenProviderOptions>(options => {
         options.TokenLifespan = TimeSpan.FromMinutes(1);

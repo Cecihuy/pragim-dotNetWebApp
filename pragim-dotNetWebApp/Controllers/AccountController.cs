@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using pragim_dotNetWebApp.Models;
 using pragim_dotNetWebApp.ViewModels;
+using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -151,7 +152,7 @@ namespace pragim_dotNetWebApp.Controllers {
           return View(model);
         }
         SignInResult signInResult = await signInManager.PasswordSignInAsync(
-          model.Email, model.Password, model.RememberMe, false
+          model.Email, model.Password, model.RememberMe, true
         );
         if(signInResult.Succeeded) {
           if(!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl)) {
@@ -159,6 +160,9 @@ namespace pragim_dotNetWebApp.Controllers {
           } else { 
             return RedirectToAction("index", "home"); 
           }
+        }
+        if(signInResult.IsLockedOut) {
+          return View("AccountLocked");
         }
         ModelState.AddModelError("", "Invalid Login Attempt");
       }
@@ -296,6 +300,9 @@ namespace pragim_dotNetWebApp.Controllers {
         if(applicationUser != null) {
           IdentityResult identityResult = await userManager.ResetPasswordAsync(applicationUser, model.Token, model.Password);
           if(identityResult.Succeeded) {
+            if(await userManager.IsLockedOutAsync(applicationUser)) {
+              await userManager.SetLockoutEndDateAsync(applicationUser, DateTimeOffset.Now);
+            }
             return View("ResetPasswordConfirmation");
           }
           foreach(IdentityError error in identityResult.Errors) {
