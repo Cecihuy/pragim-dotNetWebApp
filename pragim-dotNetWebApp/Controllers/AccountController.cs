@@ -2,14 +2,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using pragim_dotNetWebApp.Models;
 using pragim_dotNetWebApp.ViewModels;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace pragim_dotNetWebApp.Controllers {
@@ -29,7 +27,37 @@ namespace pragim_dotNetWebApp.Controllers {
       this.logger=logger;
     }
     [HttpGet]
-    public IActionResult ChangePassword() {
+    public async Task<IActionResult> AddPassword() {
+      ApplicationUser? applicationUser = await userManager.GetUserAsync(User);
+      bool userHasPassword = await userManager.HasPasswordAsync(applicationUser);
+      if(userHasPassword) {
+        return RedirectToAction("ChangePassword");
+      }
+      return View();
+    }
+    [HttpPost]
+    public async Task<IActionResult> AddPassword(AddPasswordViewModel model) {
+      if(ModelState.IsValid) {
+        ApplicationUser? applicationUser = await userManager.GetUserAsync(User);
+        IdentityResult identityResult = await userManager.AddPasswordAsync(applicationUser, model.NewPassword);
+        if(!identityResult.Succeeded) {
+          foreach(IdentityError error in identityResult.Errors) {
+            ModelState.AddModelError(string.Empty, $"{error.Code} ==> {error.Description}");
+          }
+          return View();
+        }
+        await signInManager.RefreshSignInAsync(applicationUser);
+        return View("AddPasswordConfirmation");
+      }
+      return View(model);
+    }
+    [HttpGet]
+    public async Task<IActionResult> ChangePassword() {
+      ApplicationUser? applicationUser = await userManager.GetUserAsync(User);
+      bool userHasPassword = await userManager.HasPasswordAsync(applicationUser);
+      if(!userHasPassword) {
+        return RedirectToAction("AddPassword");
+      }
       return View();
     }
     [HttpPost]
